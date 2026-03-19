@@ -9,6 +9,8 @@ import subprocess
 import logging
 from typing import Optional
 
+import config
+
 YTDLP_CMD = [sys.executable, "-m", "yt_dlp"]
 
 logger = logging.getLogger(__name__)
@@ -44,6 +46,10 @@ class Downloader:
         safe_title = "".join(c for c in title if c.isalnum() or c in " -_").strip()[:80]
         output_template = os.path.join(self.temp_dir, f"{video_id}_{safe_title}.%(ext)s")
 
+        # Fetch cookies setting
+        settings = config.load_settings()
+        browser = settings.get("youtube_cookies_browser", "chrome")
+
         # Download with yt-dlp
         cmd = [
             *YTDLP_CMD,
@@ -52,9 +58,13 @@ class Downloader:
             "--output", output_template,
             "--no-playlist",
             "--progress",
-            "--newline",
-            url,
+            "--newline"
         ]
+        
+        if browser and browser.lower() != "none":
+            cmd.extend(["--cookies-from-browser", browser.lower()])
+            
+        cmd.append(url)
 
         logger.info(f"Running: {' '.join(cmd)}")
 
@@ -110,13 +120,21 @@ class Downloader:
 
     def _get_info(self, url: str) -> dict:
         """Get video info without downloading."""
+        settings = config.load_settings()
+        browser = settings.get("youtube_cookies_browser", "chrome")
+        
         cmd = [
             *YTDLP_CMD,
             "--dump-json",
             "--no-download",
-            "--no-playlist",
-            url,
+            "--no-playlist"
         ]
+        
+        if browser and browser.lower() != "none":
+            cmd.extend(["--cookies-from-browser", browser.lower()])
+            
+        cmd.append(url)
+        
         result = subprocess.run(
             cmd, capture_output=True, text=True, encoding="utf-8", errors="replace"
         )
@@ -156,6 +174,9 @@ class Downloader:
         safe_title = "".join(c for c in title if c.isalnum() or c in " -_").strip()[:80]
         output_file = os.path.join(self.temp_dir, f"{video_id}_{safe_title}.mp4")
 
+        settings = config.load_settings()
+        browser = settings.get("youtube_cookies_browser", "chrome")
+
         cmd = [
             *YTDLP_CMD,
             "--format", "bestvideo[height<=720]+bestaudio/best[height<=720]/best",
@@ -163,9 +184,13 @@ class Downloader:
             "--output", output_file,
             "--no-playlist",
             "--live-from-start",
-            "--download-sections", f"*0-{duration_seconds}",
-            url,
+            "--download-sections", f"*0-{duration_seconds}"
         ]
+        
+        if browser and browser.lower() != "none":
+            cmd.extend(["--cookies-from-browser", browser.lower()])
+            
+        cmd.append(url)
 
         process = subprocess.Popen(
             cmd,

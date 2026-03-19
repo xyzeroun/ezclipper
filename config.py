@@ -22,14 +22,15 @@ DEFAULT_SETTINGS = {
     "whisper_model": "base",           # tiny, base, small, medium, large-v3
     "whisper_language": "id",           # Indonesian
     "max_clips": 5,
-    "min_clip_duration": 15,            # seconds
-    "max_clip_duration": 60,            # seconds
+    "min_clip_duration": 60,            # seconds
+    "max_clip_duration": 180,            # seconds
     "output_resolution": "720p",
     "output_fps": 30,
     "caption_font_size": 20,
     "caption_color": "#FFFFFF",
     "caption_highlight_color": "#FFD700",
     "caption_position": "bottom",       # bottom, center
+    "youtube_cookies_browser": "chrome",  # chrome, edge, firefox, brave, opera, vivaldi
     "auto_open_browser": True,
     "server_port": 8000,
 }

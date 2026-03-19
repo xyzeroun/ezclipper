@@ -329,6 +329,7 @@ async function loadSettings() {
         document.getElementById('set-caption-pos').value = s.caption_position || 'bottom';
         document.getElementById('set-caption-color').value = s.caption_color || '#FFFFFF';
         document.getElementById('set-highlight-color').value = s.caption_highlight_color || '#FFD700';
+        document.getElementById('set-cookies-browser').value = s.youtube_cookies_browser || 'chrome';
 
     } catch (err) {
         console.error('Failed to load settings:', err);
@@ -354,6 +355,7 @@ document.getElementById('btn-save-settings').addEventListener('click', async () 
     settings.caption_position = document.getElementById('set-caption-pos').value;
     settings.caption_color = document.getElementById('set-caption-color').value;
     settings.caption_highlight_color = document.getElementById('set-highlight-color').value;
+    settings.youtube_cookies_browser = document.getElementById('set-cookies-browser').value;
 
     try {
         await fetch('/api/settings', {
