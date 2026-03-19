@@ -7,6 +7,7 @@ import sys
 import json
 import subprocess
 import logging
+import shutil
 from typing import Optional
 
 import config
@@ -141,6 +142,11 @@ class Downloader:
         elif browser and browser.lower() != "none":
             cmd.extend(["--cookies-from-browser", browser.lower()])
             
+        # Try to find Node.js for JS Challenge
+        node_path = shutil.which("node") or r"C:\Program Files\nodejs\node.exe"
+        if os.path.exists(node_path):
+            cmd.extend(["--js-runtimes", f"node:{node_path}"])
+            
         cmd.append(url)
         
         result = subprocess.run(
@@ -201,6 +207,11 @@ class Downloader:
             cmd.extend(["--cookies", cookie_file])
         elif browser and browser.lower() != "none":
             cmd.extend(["--cookies-from-browser", browser.lower()])
+            
+        # Try to find Node.js for JS Challenge
+        node_path = shutil.which("node") or r"C:\Program Files\nodejs\node.exe"
+        if os.path.exists(node_path):
+            cmd.extend(["--js-runtimes", f"node:{node_path}"])
             
         cmd.append(url)
 
