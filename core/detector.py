@@ -40,16 +40,14 @@ class Detector:
 
     def __init__(
         self,
-        openrouter_api_key: str = "",
-        openrouter_model: str = "openai/gpt-4o-mini",
-        kie_api_key: str = "",
+        reka_api_key: str = "",
+        reka_model: str = "reka-core",
         min_clip_duration: int = 15,
         max_clip_duration: int = 60,
         max_clips: int = 5,
     ):
-        self.openrouter_api_key = openrouter_api_key
-        self.openrouter_model = openrouter_model
-        self.kie_api_key = kie_api_key
+        self.reka_api_key = reka_api_key
+        self.reka_model = reka_model
         self.min_clip_duration = min_clip_duration
         self.max_clip_duration = max_clip_duration
         self.max_clips = max_clips
@@ -151,12 +149,10 @@ Response dalam format JSON saja."""
             progress_callback("detect", 40)
 
         # Call AI API
-        if self.openrouter_api_key:
-            result = self._call_openrouter(user_prompt, keyframes)
-        elif self.kie_api_key:
-            result = self._call_kie(user_prompt, keyframes)
+        if self.reka_api_key:
+            result = self._call_reka(user_prompt, keyframes)
         else:
-            raise ValueError("No API key configured. Set OpenRouter or KIE AI API key in settings.")
+            raise ValueError("No API key configured. Set Reka AI API key in settings.")
 
         if progress_callback:
             progress_callback("detect", 90)
@@ -185,8 +181,8 @@ Response dalam format JSON saja."""
         secs = int(seconds % 60)
         return f"{mins:02d}:{secs:02d}"
 
-    def _call_openrouter(self, prompt: str, keyframes: list[str]) -> str:
-        """Call OpenRouter API."""
+    def _call_reka(self, prompt: str, keyframes: list[str]) -> str:
+        """Call Reka AI API (OpenAI compatible)."""
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
         ]
@@ -200,7 +196,6 @@ Response dalam format JSON saja."""
                 "type": "image_url",
                 "image_url": {
                     "url": f"data:image/jpeg;base64,{frame_b64}",
-                    "detail": "low",
                 },
             })
 
@@ -211,60 +206,17 @@ Response dalam format JSON saja."""
 
         messages.append({"role": "user", "content": content_parts})
 
-        logger.info(f"Calling OpenRouter: {self.openrouter_model}")
+        logger.info(f"Calling Reka AI: {self.reka_model}")
 
         with httpx.Client(timeout=120) as client:
             resp = client.post(
-                "https://openrouter.ai/api/v1/chat/completions",
+                "https://api.reka.ai/v1/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {self.openrouter_api_key}",
+                    "Authorization": f"Bearer {self.reka_api_key}",
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": self.openrouter_model,
-                    "messages": messages,
-                    "temperature": 0.7,
-                    "max_tokens": 2000,
-                },
-            )
-            resp.raise_for_status()
-            data = resp.json()
-
-        return data["choices"][0]["message"]["content"]
-
-    def _call_kie(self, prompt: str, keyframes: list[str]) -> str:
-        """Call KIE AI API."""
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-        ]
-
-        content_parts = []
-        for frame_b64 in keyframes[:5]:
-            content_parts.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{frame_b64}",
-                },
-            })
-
-        content_parts.append({
-            "type": "text",
-            "text": prompt,
-        })
-
-        messages.append({"role": "user", "content": content_parts})
-
-        logger.info("Calling KIE AI")
-
-        with httpx.Client(timeout=120) as client:
-            resp = client.post(
-                "https://api.kie.ai/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {self.kie_api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": "gpt-4o-mini",
+                    "model": self.reka_model,
                     "messages": messages,
                     "temperature": 0.7,
                     "max_tokens": 2000,

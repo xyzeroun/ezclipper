@@ -16,9 +16,8 @@ os.makedirs(TEMP_DIR, exist_ok=True)
 
 # --- Default Settings ---
 DEFAULT_SETTINGS = {
-    "openrouter_api_key": "",
-    "openrouter_model": "openai/gpt-4o-mini",
-    "kie_api_key": "",
+    "reka_api_key": "",
+    "reka_model": "reka-core",
     "whisper_model": "base",           # tiny, base, small, medium, large-v3
     "whisper_language": "id",           # Indonesian
     "max_clips": 5,

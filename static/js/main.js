@@ -320,7 +320,7 @@ async function loadSettings() {
         const s = await resp.json();
 
         // We don't pre-fill API keys for security (they're masked)
-        document.getElementById('set-openrouter-model').value = s.openrouter_model || 'openai/gpt-4o-mini';
+        document.getElementById('set-reka-model').value = s.reka_model || 'reka-core';
         document.getElementById('set-whisper-model').value = s.whisper_model || 'base';
         document.getElementById('set-whisper-lang').value = s.whisper_language || 'id';
         document.getElementById('set-min-duration').value = s.min_clip_duration || 15;
@@ -340,13 +340,10 @@ document.getElementById('btn-save-settings').addEventListener('click', async () 
     const settings = {};
 
     // API Keys — only send if user typed something
-    const orKey = document.getElementById('set-openrouter-key').value.trim();
-    if (orKey) settings.openrouter_api_key = orKey;
+    const rekaKey = document.getElementById('set-reka-key').value.trim();
+    if (rekaKey) settings.reka_api_key = rekaKey;
 
-    const kieKey = document.getElementById('set-kie-key').value.trim();
-    if (kieKey) settings.kie_api_key = kieKey;
-
-    settings.openrouter_model = document.getElementById('set-openrouter-model').value;
+    settings.reka_model = document.getElementById('set-reka-model').value;
     settings.whisper_model = document.getElementById('set-whisper-model').value;
     settings.whisper_language = document.getElementById('set-whisper-lang').value;
     settings.min_clip_duration = parseInt(document.getElementById('set-min-duration').value);

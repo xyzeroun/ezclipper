@@ -135,7 +135,7 @@ async def get_settings():
     settings = config.load_settings()
     # Mask API keys for security
     masked = settings.copy()
-    for key in ["openrouter_api_key", "kie_api_key"]:
+    for key in ["reka_api_key"]:
         if masked.get(key):
             masked[key] = masked[key][:8] + "..." + masked[key][-4:]
     return masked
@@ -265,9 +265,8 @@ def process_video(
         _update_job(job_id, current_step="🧠 AI analyzing highlights...")
 
         detector = Detector(
-            openrouter_api_key=settings.get("openrouter_api_key", ""),
-            openrouter_model=settings.get("openrouter_model", "openai/gpt-4o-mini"),
-            kie_api_key=settings.get("kie_api_key", ""),
+            reka_api_key=settings.get("reka_api_key", ""),
+            reka_model=settings.get("reka_model", "reka-core"),
             min_clip_duration=settings.get("min_clip_duration", 15),
             max_clip_duration=settings.get("max_clip_duration", 60),
             max_clips=max_clips,

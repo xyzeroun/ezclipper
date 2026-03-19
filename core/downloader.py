@@ -59,7 +59,7 @@ class Downloader:
             "--merge-output-format", "mp4",
             "--output", output_template,
             "--no-playlist",
-            "--extractor-args", "youtube:player_client=ios,default",
+            "--extractor-args", "youtube:player_client=android",
             "--progress",
             "--newline"
         ]
@@ -204,7 +204,7 @@ class Downloader:
             "--output", output_file,
             "--no-playlist",
             "--live-from-start",
-            "--extractor-args", "youtube:player_client=ios,default",
+            "--extractor-args", "youtube:player_client=android",
             "--download-sections", f"*0-{duration_seconds}"
         ]
         

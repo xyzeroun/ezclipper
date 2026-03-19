@@ -21,9 +21,8 @@ AI-powered tool yang mengubah video YouTube menjadi clip pendek viral untuk TikT
 | FFmpeg | Any | [Download](https://www.gyan.dev/ffmpeg/builds/) |
 | Git | Any | Opsional |
 
-### API Key (pilih salah satu):
-- **OpenRouter** — [Daftar di sini](https://openrouter.ai/) (rekomendasi, ~$0.01-0.05/video)
-- **KIE AI** — [Daftar di sini](https://kie.ai/) (alternatif)
+### API Key (wajib):
+- **Reka AI** — [Daftar di sini](https://chat.reka.ai/api-keys) (Rekomendasi, sangat murah/gratis)
 
 ### 🍪 Wajib: Ekstensi YouTube Cookies
 Untuk menghindari blokir "bot detection" dari YouTube (Error DPAPI), kamu **WAJIB** punya ekstensi export cookies:
@@ -182,7 +181,7 @@ Ini terjadi karena Chrome/Edge (v127+) mengunci file cookies sistem.
 Sama seperti error di atas, YouTube mendeteksi bot karena kurangnya cookies yang valid. Cukup gunakan trik file `cookies.txt` di atas.
 
 ### "No API key configured"
-Buka Settings → masukkan OpenRouter atau KIE AI API Key → Save
+Buka Settings → masukkan Reka AI API Key → Save
 
 ### Port 8000 sudah terpakai
 Edit `settings.json`, ubah `server_port` ke port lain (misal 8080)
@@ -205,8 +204,7 @@ netsh advfirewall firewall add rule name="TikTok Clipper" dir=in action=allow pr
 |----------|-------|
 | Whisper (lokal) | **GRATIS** |
 | FFmpeg | **GRATIS** |
-| OpenRouter GPT-4o-mini | ~$0.01-0.05 / video |
-| OpenRouter GPT-4o | ~$0.10-0.50 / video |
+| Reka AI Core / Flash | ~$0.01 / video |
 
 ---
 
