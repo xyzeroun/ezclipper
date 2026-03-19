@@ -49,6 +49,7 @@ class Downloader:
         # Fetch cookies setting
         settings = config.load_settings()
         browser = settings.get("youtube_cookies_browser", "chrome")
+        cookie_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cookies.txt")
 
         # Download with yt-dlp
         cmd = [
@@ -61,7 +62,9 @@ class Downloader:
             "--newline"
         ]
         
-        if browser and browser.lower() != "none":
+        if os.path.exists(cookie_file):
+            cmd.extend(["--cookies", cookie_file])
+        elif browser and browser.lower() != "none":
             cmd.extend(["--cookies-from-browser", browser.lower()])
             
         cmd.append(url)
@@ -122,6 +125,7 @@ class Downloader:
         """Get video info without downloading."""
         settings = config.load_settings()
         browser = settings.get("youtube_cookies_browser", "chrome")
+        cookie_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cookies.txt")
         
         cmd = [
             *YTDLP_CMD,
@@ -130,7 +134,9 @@ class Downloader:
             "--no-playlist"
         ]
         
-        if browser and browser.lower() != "none":
+        if os.path.exists(cookie_file):
+            cmd.extend(["--cookies", cookie_file])
+        elif browser and browser.lower() != "none":
             cmd.extend(["--cookies-from-browser", browser.lower()])
             
         cmd.append(url)
@@ -176,6 +182,7 @@ class Downloader:
 
         settings = config.load_settings()
         browser = settings.get("youtube_cookies_browser", "chrome")
+        cookie_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cookies.txt")
 
         cmd = [
             *YTDLP_CMD,
@@ -187,7 +194,9 @@ class Downloader:
             "--download-sections", f"*0-{duration_seconds}"
         ]
         
-        if browser and browser.lower() != "none":
+        if os.path.exists(cookie_file):
+            cmd.extend(["--cookies", cookie_file])
+        elif browser and browser.lower() != "none":
             cmd.extend(["--cookies-from-browser", browser.lower()])
             
         cmd.append(url)
