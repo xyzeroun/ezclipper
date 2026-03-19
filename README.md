@@ -25,6 +25,10 @@ AI-powered tool yang mengubah video YouTube menjadi clip pendek viral untuk TikT
 - **OpenRouter** — [Daftar di sini](https://openrouter.ai/) (rekomendasi, ~$0.01-0.05/video)
 - **KIE AI** — [Daftar di sini](https://kie.ai/) (alternatif)
 
+### 🍪 Wajib: Ekstensi YouTube Cookies
+Untuk menghindari blokir "bot detection" dari YouTube (Error DPAPI), kamu **WAJIB** punya ekstensi export cookies:
+- **Chrome/Edge**: [Get cookies.txt LOCALLY](https://chromewebstore.google.com/detail/get-cookiestxt-locally/ccpbcikobfhhdjfhmckahfheobnhifhi)
+
 ---
 
 ## 🚀 Instalasi di RDP / VPS / PC Lokal
@@ -76,7 +80,16 @@ pip install -r requirements.txt
 > ⏳ Ini akan menginstall: FastAPI, yt-dlp, faster-whisper, dll.
 > Pertama kali jalankan app, Whisper model (~150 MB) akan di-download otomatis.
 
-### Step 5: Jalankan App
+### Step 5: Setup YouTube Cookies (Sangat Penting! 🍪)
+
+YouTube sekarang memblokir download jika tidak ada cookies dari akun yang valid.
+1. Install ekstensi **Get cookies.txt LOCALLY** di Chrome/Edge kamu.
+2. Buka `youtube.com` dan pastikan kamu **sudah login**.
+3. Klik ekstensinya, lalu klik **Export**.
+4. Rename file yang ter-download menjadi **`cookies.txt`** (tanpa spasi).
+5. Pindahkan `cookies.txt` ke dalam folder bot: `C:\clipper\cookies.txt`
+
+### Step 6: Jalankan App
 
 ```powershell
 cd C:\clipper
@@ -161,6 +174,13 @@ ffmpeg -version
 # Jika error, tambahkan ke PATH atau install ulang
 ```
 
+### "Failed to decrypt with DPAPI" atau "Sign in to confirm you're not a bot"
+Ini terjadi karena Chrome/Edge (v127+) mengunci file cookies sistem.
+**Solusi 100% Berhasil:** Ekspor manual cookies-mu pakai ekstensi "Get cookies.txt LOCALLY" dari Chrome. Rename jadi `cookies.txt` dan taruh di folder bot yang sama dengan file `app.py`. Bot akan otomatis membaca file ini.
+
+### "n challenge solving failed"
+Sama seperti error di atas, YouTube mendeteksi bot karena kurangnya cookies yang valid. Cukup gunakan trik file `cookies.txt` di atas.
+
 ### "No API key configured"
 Buka Settings → masukkan OpenRouter atau KIE AI API Key → Save
 
@@ -190,6 +210,23 @@ netsh advfirewall firewall add rule name="TikTok Clipper" dir=in action=allow pr
 
 ---
 
+## 🔄 Cara Update App
+
+Jika ada perbaikan error atau fitur baru di GitHub, kamu bisa update tanpa install ulang:
+
+1. Buka terminal/CMD di folder bot (`C:\clipper`)
+2. Tarik update terbaru:
+   ```powershell
+   git pull
+   ```
+3. Update library (opsional, jika ada peringatan module missing):
+   ```powershell
+   pip install -r requirements.txt --upgrade
+   ```
+
+---
+
 ## 📝 Lisensi
 
 Personal use only.
+
