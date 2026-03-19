@@ -58,6 +58,7 @@ class Downloader:
             "--merge-output-format", "mp4",
             "--output", output_template,
             "--no-playlist",
+            "--extractor-args", "youtube:player_client=ios,default",
             "--progress",
             "--newline"
         ]
@@ -131,7 +132,8 @@ class Downloader:
             *YTDLP_CMD,
             "--dump-json",
             "--no-download",
-            "--no-playlist"
+            "--no-playlist",
+            "--extractor-args", "youtube:player_client=ios,default"
         ]
         
         if os.path.exists(cookie_file):
@@ -191,6 +193,7 @@ class Downloader:
             "--output", output_file,
             "--no-playlist",
             "--live-from-start",
+            "--extractor-args", "youtube:player_client=ios,default",
             "--download-sections", f"*0-{duration_seconds}"
         ]
         
