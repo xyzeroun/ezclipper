@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Clipper — AI Video Clip Generator</title>
+    <meta name="description" content="AI-powered tool to clip YouTube videos into viral TikTok clips with auto-captions">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-brand">
+            <span class="logo">🎬</span>
+            <h1>TikTok Clipper</h1>
+            <span class="badge">AI-Powered</span>
+        </div>
+        <nav class="header-nav">
+            <button class="nav-btn active" data-tab="home" id="nav-home">
+                <span class="nav-icon">🏠</span> Home
+            </button>
+            <button class="nav-btn" data-tab="clips" id="nav-clips">
+                <span class="nav-icon">📁</span> Clips
+            </button>
+            <button class="nav-btn" data-tab="schedule" id="nav-schedule">
+                <span class="nav-icon">📅</span> Schedule
+            </button>
+            <button class="nav-btn" data-tab="settings" id="nav-settings">
+                <span class="nav-icon">⚙️</span> Settings
+            </button>
+        </nav>
+    </header>
+
+    <main class="container">
+
+        <!-- ====== HOME TAB ====== -->
+        <section class="tab-content active" id="tab-home">
+            <!-- Input Card -->
+            <div class="card card-glow">
+                <div class="card-header">
+                    <h2>🚀 Generate Clips</h2>
+                    <p class="subtitle">Paste a YouTube URL and let AI find the best moments</p>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <label for="input-url">YouTube URL</label>
+                        <div class="input-row">
+                            <input type="text" id="input-url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="input-row-2col">
+                        <div class="input-group">
+                            <label for="input-clips">Max Clips</label>
+                            <select id="input-clips">
+                                <option value="3">3 clips</option>
+                                <option value="4">4 clips</option>
+                                <option value="5" selected>5 clips</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="input-type">Video Type</label>
+                            <select id="input-type">
+                                <option value="video">Regular Video</option>
+                                <option value="livestream">Livestream</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group livestream-option" style="display:none">
+                        <label for="input-livestream-duration">Livestream Duration (seconds)</label>
+                        <input type="number" id="input-livestream-duration" value="300" min="60" max="3600">
+                    </div>
+                    <button class="btn btn-primary btn-lg" id="btn-process">
+                        <span class="btn-icon">✨</span> Generate Clips
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Card -->
+            <div class="card card-progress" id="progress-card" style="display:none">
+                <div class="card-header">
+                    <h2>⏳ Processing</h2>
+                    <span class="progress-percent" id="progress-percent">0%</span>
+                </div>
+                <div class="card-body">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-step" id="progress-step">Initializing...</p>
+                    <div class="log-container" id="log-container">
+                        <div class="log-content" id="log-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="card" id="results-card" style="display:none">
+                <div class="card-header">
+                    <h2>🎉 Generated Clips</h2>
+                </div>
+                <div class="card-body">
+                    <div class="clips-grid" id="clips-grid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== CLIPS TAB ====== -->
+        <section class="tab-content" id="tab-clips">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📁 All Clips</h2>
+                    <button class="btn btn-sm" id="btn-refresh-clips">🔄 Refresh</button>
+                </div>
+                <div class="card-body">
+                    <div class="clips-list" id="all-clips-list">
+                        <p class="empty-state">No clips yet. Generate some from the Home tab!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== SCHEDULE TAB ====== -->
+        <section class="tab-content" id="tab-schedule">
+            <div class="card card-glow">
+                <div class="card-header">
+                    <h2>📅 Schedule Job</h2>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <label for="schedule-url">YouTube URL</label>
+                        <input type="text" id="schedule-url" placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+                    <div class="input-row-2col">
+                        <div class="input-group">
+                            <label for="schedule-time">Schedule Time</label>
+                            <input type="datetime-local" id="schedule-time">
+                        </div>
+                        <div class="input-group">
+                            <label for="schedule-clips">Max Clips</label>
+                            <select id="schedule-clips">
+                                <option value="3">3</option>
+                                <option value="5" selected>5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="btn-schedule">
+                        <span class="btn-icon">📅</span> Schedule
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>📋 Scheduled Jobs</h2>
+                </div>
+                <div class="card-body">
+                    <div class="jobs-list" id="jobs-list">
+                        <p class="empty-state">No scheduled jobs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== SETTINGS TAB ====== -->
+        <section class="tab-content" id="tab-settings">
+            <div class="card">
+                <div class="card-header">
+                    <h2>⚙️ Settings</h2>
+                </div>
+                <div class="card-body">
+                    <div class="settings-section">
+                        <h3>🔑 API Keys</h3>
+                        <div class="input-group">
+                            <label for="set-openrouter-key">OpenRouter API Key</label>
+                            <input type="password" id="set-openrouter-key" placeholder="sk-or-...">
+                        </div>
+                        <div class="input-group">
+                            <label for="set-openrouter-model">OpenRouter Model</label>
+                            <select id="set-openrouter-model">
+                                <option value="openai/gpt-4o-mini">GPT-4o Mini (Cheap)</option>
+                                <option value="openai/gpt-4o">GPT-4o (Better)</option>
+                                <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                                <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="set-kie-key">KIE AI API Key (Optional)</label>
+                            <input type="password" id="set-kie-key" placeholder="kie-...">
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>🎙️ Transcription</h3>
+                        <div class="input-row-2col">
+                            <div class="input-group">
+                                <label for="set-whisper-model">Whisper Model</label>
+                                <select id="set-whisper-model">
+                                    <option value="tiny">Tiny (Fast, ~1GB RAM)</option>
+                                    <option value="base" selected>Base (Balanced, ~1.5GB RAM)</option>
+                                    <option value="small">Small (Better, ~2GB RAM)</option>
+                                    <option value="medium">Medium (Good, ~5GB RAM)</option>
+                                    <option value="large-v3">Large V3 (Best, ~10GB RAM)</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="set-whisper-lang">Language</label>
+                                <select id="set-whisper-lang">
+                                    <option value="id" selected>Indonesia</option>
+                                    <option value="en">English</option>
+                                    <option value="auto">Auto Detect</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>✂️ Clip Settings</h3>
+                        <div class="input-row-2col">
+                            <div class="input-group">
+                                <label for="set-min-duration">Min Clip Duration (sec)</label>
+                                <input type="number" id="set-min-duration" value="15" min="5" max="60">
+                            </div>
+                            <div class="input-group">
+                                <label for="set-max-duration">Max Clip Duration (sec)</label>
+                                <input type="number" id="set-max-duration" value="60" min="15" max="180">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>💬 Caption Style</h3>
+                        <div class="input-row-2col">
+                            <div class="input-group">
+                                <label for="set-font-size">Font Size</label>
+                                <input type="number" id="set-font-size" value="20" min="12" max="40">
+                            </div>
+                            <div class="input-group">
+                                <label for="set-caption-pos">Position</label>
+                                <select id="set-caption-pos">
+                                    <option value="bottom" selected>Bottom</option>
+                                    <option value="center">Center</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-row-2col">
+                            <div class="input-group">
+                                <label for="set-caption-color">Text Color</label>
+                                <input type="color" id="set-caption-color" value="#FFFFFF">
+                            </div>
+                            <div class="input-group">
+                                <label for="set-highlight-color">Highlight Color</label>
+                                <input type="color" id="set-highlight-color" value="#FFD700">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="btn-save-settings">
+                        <span class="btn-icon">💾</span> Save Settings
+                    </button>
+                    <span class="save-status" id="save-status"></span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
