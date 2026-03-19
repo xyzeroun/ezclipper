@@ -45,11 +45,13 @@ class Transcriber:
             os.remove(output_path)
 
         cmd = [
-            "ffmpeg", "-i", video_path,
+            "ffmpeg", 
+            "-err_detect", "ignore_err", # Fix for corrupted AAC streams
+            "-i", video_path,
             "-vn",                      # no video
             "-acodec", "pcm_s16le",     # WAV format
             "-ar", "16000",             # 16kHz sample rate (optimal for whisper)
-            "-ac", "1",                 # mono
+            "-af", "pan=mono|c0=c0",    # Force mono using only first channel to avoid 36-channel rematrix crash
             "-y",                       # overwrite
             output_path,
         ]
