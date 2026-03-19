@@ -12,8 +12,9 @@ import threading
 from datetime import datetime
 from typing import Optional
 from contextlib import asynccontextmanager
+import shutil
 
-from fastapi import FastAPI, Request, BackgroundTasks
+from fastapi import FastAPI, Request, BackgroundTasks, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse, FileResponse
@@ -98,6 +99,39 @@ async def start_processing(request: Request, background_tasks: BackgroundTasks):
     # Run processing in background
     background_tasks.add_task(
         process_video, job_id, url, max_clips, is_livestream, livestream_duration
+    )
+
+    return {"job_id": job_id, "status": "started"}
+
+@app.post("/api/upload")
+async def upload_video(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    max_clips: int = Form(5)
+):
+    """Upload a local video and start processing."""
+    job_id = str(uuid.uuid4())[:8]
+    
+    # Save uploaded file safely
+    file_path = os.path.join(config.TEMP_DIR, f"{job_id}_{file.filename}")
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    processing_jobs[job_id] = {
+        "id": job_id,
+        "url": f"Local File: {file.filename}",
+        "status": "starting",
+        "progress": 0,
+        "current_step": "Formatting local video...",
+        "started_at": datetime.now().isoformat(),
+        "clips": [],
+        "error": None,
+        "log": [],
+    }
+
+    # Run processing in background (url holds the local path)
+    background_tasks.add_task(
+        process_video, job_id, file_path, max_clips, is_livestream=False, livestream_duration=300, is_local_file=True
     )
 
     return {"job_id": job_id, "status": "started"}
@@ -215,31 +249,42 @@ def process_video(
     max_clips: int = 5,
     is_livestream: bool = False,
     livestream_duration: int = 300,
+    is_local_file: bool = False,
 ):
     """Full processing pipeline: download → transcribe → detect → clip."""
     settings = config.load_settings()
 
     try:
-        # ===== STEP 1: DOWNLOAD =====
-        _update_job(job_id, status="downloading", current_step="📥 Downloading video...", progress=5)
-
-        downloader = Downloader(config.TEMP_DIR)
-
-        def download_progress(step, pct):
-            _update_job(job_id, progress=5 + int(pct * 0.2))
-
-        if is_livestream:
-            video_info = downloader.download_livestream(url, livestream_duration, download_progress)
+        if is_local_file:
+            # url parameter holds the local file path
+            video_path = url
+            _update_job(
+                job_id,
+                status="transcribing",
+                current_step=f"✅ Video ready from local file",
+                progress=25,
+            )
         else:
-            video_info = downloader.download(url, download_progress)
+            # ===== STEP 1: DOWNLOAD =====
+            _update_job(job_id, status="downloading", current_step="📥 Downloading video...", progress=5)
 
-        video_path = video_info["file_path"]
-        _update_job(
-            job_id,
-            status="transcribing",
-            current_step=f"✅ Downloaded: {video_info['title']}",
-            progress=25,
-        )
+            downloader = Downloader(config.TEMP_DIR)
+
+            def download_progress(step, pct):
+                _update_job(job_id, progress=5 + int(pct * 0.2))
+
+            if is_livestream:
+                video_info = downloader.download_livestream(url, livestream_duration, download_progress)
+            else:
+                video_info = downloader.download(url, download_progress)
+
+            video_path = video_info["file_path"]
+            _update_job(
+                job_id,
+                status="transcribing",
+                current_step=f"✅ Downloaded: {video_info['title']}",
+                progress=25,
+            )
 
         # ===== STEP 2: TRANSCRIBE =====
         _update_job(job_id, current_step="🎙️ Transcribing audio...")

@@ -46,6 +46,29 @@ const inputClips = document.getElementById('input-clips');
 const inputType = document.getElementById('input-type');
 const inputLivestreamDuration = document.getElementById('input-livestream-duration');
 
+// Handle source type toggle
+const radioYoutube = document.getElementById('radio-youtube');
+const radioLocal = document.getElementById('radio-local');
+const containerYoutube = document.getElementById('youtube-input-container');
+const containerLocal = document.getElementById('local-input-container');
+
+function toggleSource() {
+    if (radioYoutube && radioYoutube.checked) {
+        containerYoutube.style.display = 'block';
+        containerLocal.style.display = 'none';
+        inputType.disabled = false;
+    } else if (radioLocal && radioLocal.checked) {
+        containerYoutube.style.display = 'none';
+        containerLocal.style.display = 'block';
+        inputType.value = 'video';
+        inputType.disabled = true;
+        document.querySelector('.livestream-option').style.display = 'none';
+    }
+}
+
+if (radioYoutube) radioYoutube.addEventListener('change', toggleSource);
+if (radioLocal) radioLocal.addEventListener('change', toggleSource);
+
 // Show/hide livestream option
 inputType.addEventListener('change', () => {
     const show = inputType.value === 'livestream';
@@ -53,17 +76,18 @@ inputType.addEventListener('change', () => {
 });
 
 btnProcess.addEventListener('click', async () => {
-    const url = inputUrl.value.trim();
-    if (!url) {
-        showToast('Please enter a YouTube URL', 'error');
-        return;
-    }
+    const isLocal = radioLocal && radioLocal.checked;
+    let fetchUrl = '/api/process';
+    let fetchOptions = {};
 
-    btnProcess.disabled = true;
-    btnProcess.innerHTML = '<span class="btn-icon">⏳</span> Processing...';
-
-    try {
-        const resp = await fetch('/api/process', {
+    if (!isLocal) {
+        const url = inputUrl.value.trim();
+        if (!url) {
+            showToast('Please enter a YouTube URL', 'error');
+            return;
+        }
+        
+        fetchOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -72,7 +96,31 @@ btnProcess.addEventListener('click', async () => {
                 is_livestream: inputType.value === 'livestream',
                 livestream_duration: parseInt(inputLivestreamDuration.value),
             }),
-        });
+        };
+    } else {
+        const fileInput = document.getElementById('input-file');
+        const file = fileInput.files[0];
+        if (!file) {
+            showToast('Please select a video file', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('max_clips', inputClips.value);
+        
+        fetchUrl = '/api/upload';
+        fetchOptions = {
+            method: 'POST',
+            body: formData
+        };
+    }
+
+    btnProcess.disabled = true;
+    btnProcess.innerHTML = isLocal ? '<span class="btn-icon">⏳</span> Uploading...' : '<span class="btn-icon">⏳</span> Processing...';
+
+    try {
+        const resp = await fetch(fetchUrl, fetchOptions);
 
         const data = await resp.json();
         if (data.error) {
